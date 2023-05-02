@@ -82,9 +82,25 @@
             var booking = @json($events);
             $('#calendar').fullCalendar({
                 header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay',
+                    left: 'title',
+                    center: '',
+                    right: 'customPrevButton,prev,next,customNextButton today'
+                },
+                customButtons: {
+                    customPrevButton: {
+                        text: 'Prev',
+                        click: function() {
+                            console.log('تم النقر على زر السابق');
+                            $('#calendar').fullCalendar('prev');
+                        }
+                    },
+                    customNextButton: {
+                        text: 'Next',
+                        click: function() {
+                            console.log('تم النقر على زر التالي');
+                            $('#calendar').fullCalendar('next');
+                        }
+                    }
                 },
                 events: booking,
                 selectable: true,
@@ -92,48 +108,50 @@
                 select: function(start, end, allDay) {
 
                     alert(booking.length);
-                    if(booking.length == 0){
+                    if (booking.length == 0) {
                         $('#bookingModel').modal("toggle");
-                    $('#save_btn').click(function() {
-                        var title = $('#title').val();
-                        var color_val = $('#color_val').val();
-                        var start_date = moment(start).format('YYYY-MM-DD');
-                        var end_date = moment(end).format('YYYY-MM-DD');
-                        $.ajax({
-                            url: "{{ route('calendar.store') }}",
-                            data: {
-                                title,
-                                start_date,
-                                end_date,
-                                color_val
-                            },
-                            method: 'POST',
-                            dataType: 'json',
-                            beforeSend: function() {},
-                            success: function(response) {
-                                toastr.success('تم الحفظ');
-                                console.log(response);
-                                $('#calendar').fullCalendar('renderEvent', {
-                                    'id': response.id,
-                                    'title': response.title,
-                                    'start': response.start_date,
-                                    'end': response.end_date,
-                                    'color': response.color,
-                                });
-                                $('#bookingModel').modal("hide");
+                        $('#save_btn').click(function() {
+                            var title = $('#title').val();
+                            var color_val = $('#color_val').val();
+                            var start_date = moment(start).format('YYYY-MM-DD');
+                            var end_date = moment(end).format('YYYY-MM-DD');
+                            $.ajax({
+                                url: "{{ route('calendar.store') }}",
+                                data: {
+                                    title,
+                                    start_date,
+                                    end_date,
+                                    color_val
+                                },
+                                method: 'POST',
+                                dataType: 'json',
+                                beforeSend: function() {},
+                                success: function(response) {
+                                    toastr.success('تم الحفظ');
+                                    console.log(response);
+                                    $('#calendar').fullCalendar('renderEvent', {
+                                        'id': response.id,
+                                        'title': response.title,
+                                        'start': response.start_date,
+                                        'end': response.end_date,
+                                        'color': response.color,
+                                    });
+                                    $('#bookingModel').modal("hide");
 
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                $.each(jqXHR.responseJSON.errors, function(key,
-                                    val) {
-                                    $("#" + key + "_error").text(val[0]);
-                                    $('input[name=' + key + ']').addClass(
-                                        'is-invalid');
-                                });
-                            },
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    $.each(jqXHR.responseJSON.errors, function(key,
+                                        val) {
+                                        $("#" + key + "_error").text(val[
+                                        0]);
+                                        $('input[name=' + key + ']')
+                                            .addClass(
+                                                'is-invalid');
+                                    });
+                                },
+                            });
                         });
-                    });
-                    }else {
+                    } else {
                         false;
                     }
 
@@ -249,6 +267,16 @@
         //         $('#select').prop('disabled', true);
         //     }
         // });
+
+
+        $(document).on('click', '.fc-next-button ', function(e) {
+            e.preventDefault();
+            var view = $('#calendar').fullCalendar('getView');
+            var currentTime = view.title; // يحتوي على الوقت المعروض في التقويم
+            var currentDay = view.calendar.getDate(); // يحتوي على اليوم المعروض في التقويم
+            console.log(currentDay);
+
+        })
     </script>
 </body>
 

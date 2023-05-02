@@ -23,6 +23,22 @@ class CalendarController extends Controller
 
         return view('calendar.index' , ['events' => $events]);
     }
+    public function index1()
+    {
+        $bookings = Booking::all();
+        $events = array();
+        foreach($bookings as $booking) {
+            $events[] = [
+                'id' => $booking->id,
+                'title' => $booking->title,
+                'start' => $booking->start_date,
+                'end' => $booking->end_date,
+                'color' => $booking->color,
+            ];
+        }
+
+        return view('calendar.index1' , ['events' => $events]);
+    }
 
 
     public function store(Request $request)
